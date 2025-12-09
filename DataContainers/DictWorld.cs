@@ -35,6 +35,14 @@ public sealed class DictWorld(IDalamudPluginInterface pluginInterface, Logger lo
         if (world.IsPublic)
             return true;
 
+        // Korean servers
+        if (world.UserType == 101 && world.RowId > 1000)
+            return true;
+
+        // Chinese servers (CN/TW)
+        if (world.UserType == 151 && world.RowId >= 4028)
+            return true;
+
         return char.IsUpper((char)world.Name.Data.Span[0]);
     }
 
