@@ -1,4 +1,6 @@
 using System.Collections.Frozen;
+using System.Text;
+using System.Text.RegularExpressions;
 using Dalamud.Interface;
 using Dalamud.Interface.Utility.Raii;
 using Dalamud.Plugin.Services;
@@ -288,6 +290,18 @@ public class ActorIdentifierFactory(ObjectManager _objects, IFramework _framewor
     /// <summary> Checks SE naming rules. </summary>
     public static bool VerifyPlayerName(ReadOnlySpan<byte> name)
     {
+        return name.Contains((byte)' ') ? VerifyEnglishPlayerName(name) : VerifyChinesePlayerName(name);
+    }
+
+    /// <summary> Checks SE naming rules. </summary>
+    public static bool VerifyPlayerName(ReadOnlySpan<char> name)
+    {
+        return name.Contains(' ') ? VerifyEnglishPlayerName(name) : VerifyChinesePlayerName(name);
+    }
+
+    /// <summary> Checks SE naming rules for English player names. </summary>
+    private static bool VerifyEnglishPlayerName(ReadOnlySpan<byte> name)
+    {
         // Total no more than 20 characters + space.
         if (name.Length is < 5 or > 21)
             return false;
@@ -300,8 +314,8 @@ public class ActorIdentifierFactory(ObjectManager _objects, IFramework _framewor
         return CheckNamePart(name[..splitIndex], 2, 15) && CheckNamePart(name[(splitIndex + 1)..], 2, 15);
     }
 
-    /// <summary> Checks SE naming rules. </summary>
-    public static bool VerifyPlayerName(ReadOnlySpan<char> name)
+    /// <summary> Checks SE naming rules for English player names. </summary>
+    private static bool VerifyEnglishPlayerName(ReadOnlySpan<char> name)
     {
         // Total no more than 20 characters + space.
         if (name.Length is < 5 or > 21)
@@ -313,6 +327,22 @@ public class ActorIdentifierFactory(ObjectManager _objects, IFramework _framewor
             return false;
 
         return CheckNamePart(name[..splitIndex], 2, 15) && CheckNamePart(name[(splitIndex + 1)..], 2, 15);
+    }
+
+    /// <summary> Validates Chinese/TW/KR player name using CN server rules (Byte version). </summary>
+    private static bool VerifyChinesePlayerName(ReadOnlySpan<byte> nickName)
+    {
+        string nickNamePatt_CN = @"^[\u4E00-\u9FFF\u00B7][\u4E00-\u9FFF\u00B7A-Za-z]{0,5}$|^[A-Z][\u4E00-\u9FFF\u00B7A-Za-z]{0,5}$";
+        string nickNameStr = Encoding.UTF8.GetString(nickName);
+        return Regex.IsMatch(nickNameStr, nickNamePatt_CN);
+    }
+
+    /// <summary> Validates Chinese/TW/KR player name using CN server rules (Char version). </summary>
+    private static bool VerifyChinesePlayerName(ReadOnlySpan<char> nickName)
+    {
+        string nickNamePatt_CN = @"^[\u4E00-\u9FFF\u00B7][\u4E00-\u9FFF\u00B7A-Za-z]{0,5}$|^[A-Z][\u4E00-\u9FFF\u00B7A-Za-z]{0,5}$";
+        string nickNameStr = nickName.ToString();
+        return Regex.IsMatch(nickNameStr, nickNamePatt_CN);
     }
 
     /// <summary> Checks SE naming rules. </summary>
