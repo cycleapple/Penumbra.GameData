@@ -330,17 +330,33 @@ public class ActorIdentifierFactory(ObjectManager _objects, IFramework _framewor
     }
 
     /// <summary> Validates Chinese/TW/KR player name using CN server rules (Byte version). </summary>
+    /// <remarks>
+    /// Supported Unicode ranges:
+    /// - \u3100-\u312F: Bopomofo (注音符號)
+    /// - \u31A0-\u31BF: Bopomofo Extended
+    /// - \u3400-\u4DBF: CJK Extension A (罕用字)
+    /// - \u4E00-\u9FFF: CJK Unified Ideographs (基本中文字)
+    /// - \u00B7: Middle dot (·)
+    /// </remarks>
     private static bool VerifyChinesePlayerName(ReadOnlySpan<byte> nickName)
     {
-        string nickNamePatt_CN = @"^[\u4E00-\u9FFF\u00B7][\u4E00-\u9FFF\u00B7A-Za-z]{0,5}$|^[A-Z][\u4E00-\u9FFF\u00B7A-Za-z]{0,5}$";
+        string nickNamePatt_CN = @"^[\u3100-\u312F\u31A0-\u31BF\u3400-\u4DBF\u4E00-\u9FFF\u00B7][\u3100-\u312F\u31A0-\u31BF\u3400-\u4DBF\u4E00-\u9FFF\u00B7A-Za-z]{0,5}$|^[A-Z][\u3100-\u312F\u31A0-\u31BF\u3400-\u4DBF\u4E00-\u9FFF\u00B7A-Za-z]{0,5}$";
         string nickNameStr = Encoding.UTF8.GetString(nickName);
         return Regex.IsMatch(nickNameStr, nickNamePatt_CN);
     }
 
     /// <summary> Validates Chinese/TW/KR player name using CN server rules (Char version). </summary>
+    /// <remarks>
+    /// Supported Unicode ranges:
+    /// - \u3100-\u312F: Bopomofo (注音符號)
+    /// - \u31A0-\u31BF: Bopomofo Extended
+    /// - \u3400-\u4DBF: CJK Extension A (罕用字)
+    /// - \u4E00-\u9FFF: CJK Unified Ideographs (基本中文字)
+    /// - \u00B7: Middle dot (·)
+    /// </remarks>
     private static bool VerifyChinesePlayerName(ReadOnlySpan<char> nickName)
     {
-        string nickNamePatt_CN = @"^[\u4E00-\u9FFF\u00B7][\u4E00-\u9FFF\u00B7A-Za-z]{0,5}$|^[A-Z][\u4E00-\u9FFF\u00B7A-Za-z]{0,5}$";
+        string nickNamePatt_CN = @"^[\u3100-\u312F\u31A0-\u31BF\u3400-\u4DBF\u4E00-\u9FFF\u00B7][\u3100-\u312F\u31A0-\u31BF\u3400-\u4DBF\u4E00-\u9FFF\u00B7A-Za-z]{0,5}$|^[A-Z][\u3100-\u312F\u31A0-\u31BF\u3400-\u4DBF\u4E00-\u9FFF\u00B7A-Za-z]{0,5}$";
         string nickNameStr = nickName.ToString();
         return Regex.IsMatch(nickNameStr, nickNamePatt_CN);
     }
