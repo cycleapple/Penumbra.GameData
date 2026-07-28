@@ -9,9 +9,14 @@ public static class ExcelSheetExtensions
 {
     /// <summary>Return a language backed by pages in the TW client's Excel data.</summary>
     public static ClientLanguage GetSafeLanguage(this IDataManager dataManager)
-        => dataManager.Language == ClientLanguage.ChineseTraditional
-            ? ClientLanguage.English
-            : dataManager.Language;
+        => dataManager.Language switch
+        {
+            ClientLanguage.Japanese or
+            ClientLanguage.English or
+            ClientLanguage.German or
+            ClientLanguage.French => dataManager.Language,
+            _                     => ClientLanguage.English,
+        };
 
     /// <summary>Load a sheet using English when the TW client reports its unsupported legacy language slot.</summary>
     public static ExcelSheet<T> GetSafeExcelSheet<T>(
@@ -21,8 +26,14 @@ public static class ExcelSheetExtensions
         where T : struct, IExcelRow<T>
     {
         var actualLanguage = language ?? dataManager.GetSafeLanguage();
-        if (actualLanguage == ClientLanguage.ChineseTraditional)
-            actualLanguage = ClientLanguage.English;
+        actualLanguage = actualLanguage switch
+        {
+            ClientLanguage.Japanese or
+            ClientLanguage.English or
+            ClientLanguage.German or
+            ClientLanguage.French => actualLanguage,
+            _                     => ClientLanguage.English,
+        };
 
         return dataManager.GetExcelSheet<T>(actualLanguage, name);
     }
