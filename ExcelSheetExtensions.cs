@@ -7,34 +7,22 @@ namespace Penumbra.GameData;
 /// <summary>Compatibility helpers for game clients whose configured language has no matching Excel pages.</summary>
 public static class ExcelSheetExtensions
 {
-    /// <summary>Return a language backed by pages in the TW client's Excel data.</summary>
+    /// <summary>Return a defined language token for caches and non-Excel Dalamud APIs.</summary>
     public static ClientLanguage GetSafeLanguage(this IDataManager dataManager)
-        => NormalizeLanguage(dataManager.Language);
+        => Enum.IsDefined(dataManager.Language)
+            ? dataManager.Language
+            : ClientLanguage.ChineseSimplified;
 
-    /// <summary>Load a sheet using English when the TW client reports its unsupported legacy language slot.</summary>
+    /// <summary>Load TC Excel pages when API 13 receives the TW client's unsupported language slot.</summary>
     public static ExcelSheet<T> GetSafeExcelSheet<T>(
         this IDataManager dataManager,
         ClientLanguage? language = null,
         string? name = null)
         where T : struct, IExcelRow<T>
     {
-        var actualLanguage = language ?? dataManager.GetSafeLanguage();
-        actualLanguage = NormalizeLanguage(actualLanguage);
+        if (!Enum.IsDefined(dataManager.Language))
+            return dataManager.GameData.GetExcelSheet<T>((Lumina.Data.Language)8, name)!;
 
-        return dataManager.GetExcelSheet<T>(actualLanguage, name);
+        return dataManager.GetExcelSheet<T>(language ?? dataManager.Language, name);
     }
-
-    private static ClientLanguage NormalizeLanguage(ClientLanguage language)
-        => language switch
-        {
-            ClientLanguage.ChineseTraditional => ClientLanguage.TraditionalChinese,
-            ClientLanguage.Japanese or
-            ClientLanguage.English or
-            ClientLanguage.German or
-            ClientLanguage.French or
-            ClientLanguage.ChineseSimplified or
-            ClientLanguage.Korean or
-            ClientLanguage.TraditionalChinese => language,
-            _                                 => ClientLanguage.TraditionalChinese,
-        };
 }
