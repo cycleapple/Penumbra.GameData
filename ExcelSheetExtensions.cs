@@ -24,7 +24,7 @@ public static class ExcelSheetExtensions
         }
         catch (Lumina.Excel.Exceptions.UnsupportedLanguageException)
         {
-            return dataManager.GameData.GetExcelSheet<T>((Lumina.Data.Language)8, name)!;
+            return dataManager.GameData.Excel.GetSheet<T>((Lumina.Data.Language)8, name);
         }
     }
 }
