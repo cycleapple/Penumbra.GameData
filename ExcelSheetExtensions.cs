@@ -11,16 +11,20 @@ public static class ExcelSheetExtensions
     public static ClientLanguage GetSafeLanguage(this IDataManager dataManager)
         => dataManager.Language;
 
-    /// <summary>Load TC Excel pages when API 13 receives the TW client's unsupported language slot.</summary>
+    /// <summary>Load TC Excel pages when API 13 can not map the launcher's language to Lumina.</summary>
     public static ExcelSheet<T> GetSafeExcelSheet<T>(
         this IDataManager dataManager,
         ClientLanguage? language = null,
         string? name = null)
         where T : struct, IExcelRow<T>
     {
-        if (!Enum.IsDefined(dataManager.Language))
+        try
+        {
+            return dataManager.GetExcelSheet<T>(language ?? dataManager.Language, name);
+        }
+        catch (Lumina.Excel.Exceptions.UnsupportedLanguageException)
+        {
             return dataManager.GameData.GetExcelSheet<T>((Lumina.Data.Language)8, name)!;
-
-        return dataManager.GetExcelSheet<T>(language ?? dataManager.Language, name);
+        }
     }
 }
