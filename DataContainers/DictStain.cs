@@ -10,13 +10,13 @@ namespace Penumbra.GameData.DataContainers;
 
 /// <summary> A dictionary that maps StainIds to Stains. </summary>
 public sealed class DictStain(IDalamudPluginInterface pluginInterface, Logger log, IDataManager gameData)
-    : DataSharer<IReadOnlyDictionary<byte, (string Name, uint Dye, bool Gloss)>>(pluginInterface, log, "Stains", gameData.Language, Version.DictStain,
+    : DataSharer<IReadOnlyDictionary<byte, (string Name, uint Dye, bool Gloss)>>(pluginInterface, log, "Stains", gameData.GetSafeLanguage(), Version.DictStain,
         () => CreateStainData(gameData)), IReadOnlyDictionary<StainId, Stain>
 {
     /// <summary> Create the data. </summary>
     private static IReadOnlyDictionary<byte, (string Name, uint Dye, bool Gloss)> CreateStainData(IDataManager dataManager)
     {
-        var stainSheet = dataManager.GetExcelSheet<Lumina.Excel.Sheets.Stain>(dataManager.Language);
+        var stainSheet = dataManager.GetSafeExcelSheet<Lumina.Excel.Sheets.Stain>(dataManager.GetSafeLanguage());
         return stainSheet.Where(s => s.Color != 0 && s.Name.ByteLength > 0)
             .ToFrozenDictionary(s => (byte)s.RowId, s =>
             {

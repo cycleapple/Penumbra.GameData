@@ -10,7 +10,7 @@ namespace Penumbra.GameData.DataContainers;
 
 /// <summary> A dictionary that maps full item types to lists of all corresponding items. </summary>
 public sealed class ItemsByType(IDalamudPluginInterface pi, Logger log, IDataManager dataManager, DictBonusItems bonusItems)
-    : DataSharer<IReadOnlyList<IReadOnlyList<PseudoEquipItem>>>(pi, log, "ItemsByType", dataManager.Language, Version.ItemsByType,
+    : DataSharer<IReadOnlyList<IReadOnlyList<PseudoEquipItem>>>(pi, log, "ItemsByType", dataManager.GetSafeLanguage(), Version.ItemsByType,
             () => CreateItems(dataManager, bonusItems)),
         IReadOnlyDictionary<FullEquipType, IReadOnlyList<EquipItem>>
 {
@@ -19,7 +19,7 @@ public sealed class ItemsByType(IDalamudPluginInterface pi, Logger log, IDataMan
     {
         var tmp = Enum.GetValues<FullEquipType>().Select(_ => new List<EquipItem>(1024)).ToArray();
 
-        var itemSheet = dataManager.GetExcelSheet<Item>(dataManager.Language)!;
+        var itemSheet = dataManager.GetSafeExcelSheet<Item>(dataManager.GetSafeLanguage())!;
         // Take all items with actual names.
         foreach (var item in itemSheet.Where(i => i.Name.ByteLength > 1))
         {
