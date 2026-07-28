@@ -16,10 +16,10 @@ public sealed class DictOrnament(IDalamudPluginInterface pluginInterface, Logger
     /// <summary> Create the data. </summary>
     private static IReadOnlyDictionary<uint, string> CreateOrnamentData(IDataManager gameData)
     {
-        var sheet = gameData.GetExcelSheet<Ornament>(gameData.Language)!;
+        var sheet = gameData.GetSafeExcelSheet<Ornament>(gameData.GetSafeLanguage())!;
         var dict  = new Dictionary<uint, string>((int)sheet.Count);
         foreach (var o in sheet.Where(o => o.Singular.ByteLength > 0))
-            dict.TryAdd(o.RowId, DataUtility.ToTitleCaseExtended(o.Singular, gameData.Language));
+            dict.TryAdd(o.RowId, DataUtility.ToTitleCaseExtended(o.Singular, gameData.GetSafeLanguage()));
         return dict.ToFrozenDictionary();
     }
 

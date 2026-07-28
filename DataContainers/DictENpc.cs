@@ -18,10 +18,10 @@ public sealed class DictENpc(IDalamudPluginInterface pluginInterface, Logger log
     /// <summary> Create the data. </summary>
     private static IReadOnlyDictionary<uint, string> CreateENpcData(IDataManager gameData, ISeStringEvaluator evaluator)
     {
-        var sheet = gameData.GetExcelSheet<ENpcResident>(gameData.Language);
+        var sheet = gameData.GetSafeExcelSheet<ENpcResident>(gameData.GetSafeLanguage());
         var dict = new Dictionary<uint, string>(sheet.Count);
         foreach (var n in sheet.Where(e => e.Singular.ByteLength > 0))
-            dict.TryAdd(n.RowId, evaluator.EvaluateObjStr(ObjectKind.EventNpc, n.RowId, gameData.Language));
+            dict.TryAdd(n.RowId, evaluator.EvaluateObjStr(ObjectKind.EventNpc, n.RowId, gameData.GetSafeLanguage()));
         return dict.ToFrozenDictionary();
     }
 

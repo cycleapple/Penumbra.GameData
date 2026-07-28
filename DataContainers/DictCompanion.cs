@@ -18,10 +18,10 @@ public sealed class DictCompanion(IDalamudPluginInterface pluginInterface, Logge
     /// <summary> Create the data. </summary>
     private static IReadOnlyDictionary<uint, string> CreateCompanionData(IDataManager gameData, ISeStringEvaluator evaluator)
     {
-        var sheet = gameData.GetExcelSheet<Companion>(gameData.Language)!;
+        var sheet = gameData.GetSafeExcelSheet<Companion>(gameData.GetSafeLanguage())!;
         var dict = new Dictionary<uint, string>(sheet.Count);
         foreach (var c in sheet.Where(c => c.Singular.ByteLength > 0 && c.Order < ushort.MaxValue))
-            dict.TryAdd(c.RowId, evaluator.EvaluateObjStr(ObjectKind.Companion, c.RowId, gameData.Language));
+            dict.TryAdd(c.RowId, evaluator.EvaluateObjStr(ObjectKind.Companion, c.RowId, gameData.GetSafeLanguage()));
         return dict.ToFrozenDictionary();
     }
 

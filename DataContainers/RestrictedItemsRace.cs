@@ -12,15 +12,15 @@ namespace Penumbra.GameData.DataContainers;
 
 /// <summary> A set of items restricted to specific races. </summary>
 public sealed class RestrictedItemsRace(IDalamudPluginInterface pluginInterface, Logger log, IDataManager gameData)
-    : DataSharer<IReadOnlySet<uint>>(pluginInterface, log, "RacialRestrictedItems", gameData.Language, Version.RestrictedItems, () => CreateItems(log, gameData))
+    : DataSharer<IReadOnlySet<uint>>(pluginInterface, log, "RacialRestrictedItems", gameData.GetSafeLanguage(), Version.RestrictedItems, () => CreateItems(log, gameData))
 {
     /// <summary> Create the data and also warn for unknown restrictions. </summary>
     private static FrozenSet<uint> CreateItems(Logger log, IDataManager gameData)
     {
         var ret = RaceGenderGroup.Where(c => c is not 0 and not uint.MaxValue).ToHashSet();
 
-        var items      = gameData.GetExcelSheet<Item>();
-        var categories = gameData.GetExcelSheet<EquipRaceCategory>(gameData.Language);
+        var items      = gameData.GetSafeExcelSheet<Item>();
+        var categories = gameData.GetSafeExcelSheet<EquipRaceCategory>(gameData.GetSafeLanguage());
         foreach (var item in items.Where(i => i.EquipRestriction > 3))
         {
             if (ret.Contains((uint)item.ModelMain))
