@@ -7,11 +7,9 @@ namespace Penumbra.GameData;
 /// <summary>Compatibility helpers for game clients whose configured language has no matching Excel pages.</summary>
 public static class ExcelSheetExtensions
 {
-    /// <summary>Return a defined language token for caches and non-Excel Dalamud APIs.</summary>
+    /// <summary>Preserve the launcher's language token for caches and non-Excel game APIs.</summary>
     public static ClientLanguage GetSafeLanguage(this IDataManager dataManager)
-        => Enum.IsDefined(dataManager.Language)
-            ? dataManager.Language
-            : ClientLanguage.ChineseSimplified;
+        => dataManager.Language;
 
     /// <summary>Load TC Excel pages when API 13 receives the TW client's unsupported language slot.</summary>
     public static ExcelSheet<T> GetSafeExcelSheet<T>(
