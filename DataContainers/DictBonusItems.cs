@@ -13,14 +13,14 @@ namespace Penumbra.GameData.DataContainers;
 /// <summary> A dictionary that maps GlassesIds to Glasses. </summary>
 public sealed class DictBonusItems(IDalamudPluginInterface pluginInterface, Logger log, IDataManager gameData)
     : DataSharer<IReadOnlyDictionary<ushort, PseudoEquipItem>>(pluginInterface, log, "BonusItems",
-        gameData.Language, Version.DictBonusItems, () => CreateGlassesData(gameData)), IReadOnlyDictionary<BonusItemId, EquipItem>
+        gameData.GetSafeLanguage(), Version.DictBonusItems, () => CreateGlassesData(gameData)), IReadOnlyDictionary<BonusItemId, EquipItem>
 {
     /// <summary> Create the data. </summary>
     private static IReadOnlyDictionary<ushort, PseudoEquipItem> CreateGlassesData(
         IDataManager dataManager)
     {
         // TODO
-        var glassesSheet = dataManager.GetExcelSheet<Glasses>(dataManager.Language);
+        var glassesSheet = dataManager.GetSafeExcelSheet<Glasses>(dataManager.GetSafeLanguage());
         return glassesSheet.Where(s => s.Name.ByteLength > 0)
             .ToFrozenDictionary(s => (ushort)s.RowId, FromBonusItem);
     }

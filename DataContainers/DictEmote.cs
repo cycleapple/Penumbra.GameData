@@ -12,12 +12,12 @@ namespace Penumbra.GameData.DataContainers;
 
 /// <summary> A dictionary mapping certain path keys to emote identities. </summary>
 public sealed class DictEmote(IDalamudPluginInterface pluginInterface, Logger log, IDataManager data)
-    : DictLuminaName<Emote>(pluginInterface, log, "Emotes", data.Language, Version.DictEmote, () => CreateEmoteList(log, data))
+    : DictLuminaName<Emote>(pluginInterface, log, "Emotes", data.GetSafeLanguage(), Version.DictEmote, () => CreateEmoteList(log, data))
 {
     /// <summary> Create the data. </summary>
     private static IReadOnlyDictionary<string, IReadOnlyList<Emote>> CreateEmoteList(Logger log, IDataManager gameData)
     {
-        var sheet   = gameData.GetExcelSheet<Emote>(gameData.Language)!;
+        var sheet   = gameData.GetSafeExcelSheet<Emote>(gameData.GetSafeLanguage())!;
         var storage = new ConcurrentDictionary<string, ConcurrentBag<Emote>>();
 
         var options = new ParallelOptions

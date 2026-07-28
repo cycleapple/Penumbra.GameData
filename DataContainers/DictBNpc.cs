@@ -18,10 +18,10 @@ public sealed class DictBNpc(IDalamudPluginInterface pluginInterface, Logger log
     /// <summary> Create the data. </summary>
     private static IReadOnlyDictionary<uint, string> CreateBNpcData(IDataManager gameData, ISeStringEvaluator evaluator)
     {
-        var sheet = gameData.GetExcelSheet<BNpcName>(gameData.Language)!;
+        var sheet = gameData.GetSafeExcelSheet<BNpcName>(gameData.GetSafeLanguage())!;
         var dict = new Dictionary<uint, string>(sheet.Count);
         foreach (var n in sheet.Where(n => n.Singular.ByteLength > 0))
-            dict.TryAdd(n.RowId, evaluator.EvaluateObjStr(ObjectKind.BattleNpc, n.RowId, gameData.Language));
+            dict.TryAdd(n.RowId, evaluator.EvaluateObjStr(ObjectKind.BattleNpc, n.RowId, gameData.GetSafeLanguage()));
         return dict.ToFrozenDictionary();
     }
 
