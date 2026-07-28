@@ -9,7 +9,7 @@ namespace Penumbra.GameData.DataContainers;
 
 /// <summary> A dictionary that matches action keys to their identities. </summary>
 public sealed class DictAction(IDalamudPluginInterface pluginInterface, Logger log, IDataManager data)
-    : DictLuminaName<Lumina.Excel.Sheets.Action>(pluginInterface, log, "Actions", data.Language, Version.DictAction, () => CreateActionList(data))
+    : DictLuminaName<Lumina.Excel.Sheets.Action>(pluginInterface, log, "Actions", data.GetSafeLanguage(), Version.DictAction, () => CreateActionList(data))
 {
     /// <remarks>This is too much effort to do accurately.</remarks>>
     protected override int TypeSize
@@ -18,7 +18,7 @@ public sealed class DictAction(IDalamudPluginInterface pluginInterface, Logger l
     /// <summary> Create the list. </summary>
     private static IReadOnlyDictionary<string, IReadOnlyList<Lumina.Excel.Sheets.Action>> CreateActionList(IDataManager gameData)
     {
-        var sheet   = gameData.GetExcelSheet<Lumina.Excel.Sheets.Action>(gameData.Language)!;
+        var sheet   = gameData.GetSafeExcelSheet<Lumina.Excel.Sheets.Action>(gameData.GetSafeLanguage())!;
         var storage = new ConcurrentDictionary<string, ConcurrentBag<Lumina.Excel.Sheets.Action>>();
 
         var options = new ParallelOptions

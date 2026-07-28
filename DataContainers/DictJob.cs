@@ -14,11 +14,11 @@ public sealed class DictJob : IDataContainer, IReadOnlyDictionary<JobId, Job>
     public DictJob(IDataManager gameData)
     {
         var stopwatch = Stopwatch.StartNew();
-        _jobs = gameData.GetExcelSheet<ClassJob>()
-            .Where(j => j.Abbreviation.ByteLength > 0)
+        var sheet     = gameData.GetSafeExcelSheet<ClassJob>();
+        _jobs = sheet.Where(j => j.Abbreviation.ByteLength > 0)
             .ToFrozenDictionary(j => (JobId)j.RowId, j => new Job(j));
 
-        Ordered = gameData.GetExcelSheet<ClassJob>()!.Skip(1)
+        Ordered = sheet.Skip(1)
             .Select(j => (j, _jobs[(JobId)j.RowId]))
             .OrderBy(j => j.Item1.JobIndex == 0)
             .ThenBy(j => j.Item1.IsLimitedJob)

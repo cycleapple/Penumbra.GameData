@@ -20,7 +20,7 @@ public abstract class NameDictionary(
     string name,
     int version,
     Func<IReadOnlyDictionary<uint, string>> factory)
-    : DataSharer<IReadOnlyDictionary<uint, string>>(pluginInterface, log, name, gameData.Language, version, factory),
+    : DataSharer<IReadOnlyDictionary<uint, string>>(pluginInterface, log, name, gameData.GetSafeLanguage(), version, factory),
         IReadOnlyDictionary<NpcId, string>
 {
     /// <inheritdoc/>
