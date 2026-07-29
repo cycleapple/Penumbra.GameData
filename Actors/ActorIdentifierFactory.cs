@@ -405,9 +405,14 @@ public class ActorIdentifierFactory(ObjectManager _objects, IFramework _framewor
         return true;
     }
 
-    /// <summary> Checks if the world is a valid public world or ushort.MaxValue (any world). </summary>
+    /// <summary>
+    /// Checks that the world ID is usable.
+    /// Do not require it to be present in the world-name dictionary: Taiwan
+    /// production world IDs can be present on actors while absent from the
+    /// world sheet exposed by Dalamud.
+    /// </summary>
     public bool VerifyWorld(WorldId worldId)
-        => worldId == WorldId.AnyWorld || _data.Worlds.ContainsKey(worldId.Id);
+        => worldId.Id != 0;
 
     /// <summary> Verify that the enum value is a specific actor and return the name if it is. </summary>
     public static bool VerifySpecial(ScreenActor actor)
