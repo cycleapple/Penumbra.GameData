@@ -477,8 +477,21 @@ public class ActorIdentifierFactory(ObjectManager _objects, IFramework _framewor
         var name      = actor.Utf8Name;
         var homeWorld = actor.HomeWorld;
         return check
-            ? CreatePlayer(name, homeWorld)
+            ? CreatePlayerFromGameObjectData(name, homeWorld)
             : CreateIndividualUnchecked(IdentifierType.Player, name, homeWorld, ObjectKind.None, uint.MaxValue);
+    }
+
+    /// <summary>
+    /// Create a player identifier from data read directly from a live game object.
+    /// The object has already been validated and identified as a player, so localized
+    /// client naming rules and incomplete regional world sheets must not reject it.
+    /// </summary>
+    private static ActorIdentifier CreatePlayerFromGameObjectData(ByteString name, WorldId homeWorld)
+    {
+        if (name.IsEmpty || homeWorld.Id is 0 or ushort.MaxValue)
+            return ActorIdentifier.Invalid;
+
+        return new ActorIdentifier(IdentifierType.Player, ObjectKind.Player, homeWorld, 0, name);
     }
 
     /// <summary> Create a battle npc from the game object.</summary>
