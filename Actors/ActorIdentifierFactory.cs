@@ -1,6 +1,5 @@
 using System.Collections.Frozen;
 using System.Text;
-using System.Text.RegularExpressions;
 using Dalamud.Bindings.ImGui;
 using Dalamud.Interface;
 using Dalamud.Interface.Utility.Raii;
@@ -325,15 +324,31 @@ public class ActorIdentifierFactory(ObjectManager _objects, IFramework _framewor
         return CheckNamePart(name[..splitIndex], 2, 15) && CheckNamePart(name[(splitIndex + 1)..], 2, 15);
     }
 
-    /// <summary> Validates CN/TW/KR player names, including Bopomofo and CJK Extension A. </summary>
+    /// <summary> Validates localized player names encoded as UTF-8. </summary>
     private static bool VerifyChinesePlayerName(ReadOnlySpan<byte> name)
-        => Regex.IsMatch(Encoding.UTF8.GetString(name),
-            @"^[\u3100-\u312F\u31A0-\u31BF\u3400-\u4DBF\u4E00-\u9FFF\u00B7][\u3100-\u312F\u31A0-\u31BF\u3400-\u4DBF\u4E00-\u9FFF\u00B7A-Za-z]{0,5}$|^[A-Z][\u3100-\u312F\u31A0-\u31BF\u3400-\u4DBF\u4E00-\u9FFF\u00B7A-Za-z]{0,5}$");
+        => VerifyLocalizedPlayerName(Encoding.UTF8.GetString(name));
 
-    /// <summary> Validates CN/TW/KR player names, including Bopomofo and CJK Extension A. </summary>
+    /// <summary> Validates localized player names. </summary>
     private static bool VerifyChinesePlayerName(ReadOnlySpan<char> name)
-        => Regex.IsMatch(name.ToString(),
-            @"^[\u3100-\u312F\u31A0-\u31BF\u3400-\u4DBF\u4E00-\u9FFF\u00B7][\u3100-\u312F\u31A0-\u31BF\u3400-\u4DBF\u4E00-\u9FFF\u00B7A-Za-z]{0,5}$|^[A-Z][\u3100-\u312F\u31A0-\u31BF\u3400-\u4DBF\u4E00-\u9FFF\u00B7A-Za-z]{0,5}$");
+        => VerifyLocalizedPlayerName(name);
+
+    /// <summary>
+    /// Validates the single-part names used by localized clients.
+    /// Taiwan names are limited to six Unicode characters and may contain letters,
+    /// numbers or the common CJK middle-dot separators.
+    /// </summary>
+    private static bool VerifyLocalizedPlayerName(ReadOnlySpan<char> name)
+    {
+        var count = 0;
+        foreach (var rune in name.EnumerateRunes())
+        {
+            if (++count > 6
+             || (!Rune.IsLetterOrDigit(rune) && rune.Value is not (0x00B7 or 0x30FB)))
+                return false;
+        }
+
+        return count > 0;
+    }
 
     /// <summary> Checks SE naming rules. </summary>
     public static bool VerifyRetainerName(ReadOnlySpan<byte> name)
