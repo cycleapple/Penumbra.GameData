@@ -244,6 +244,22 @@ public class ActorIdentifierFactory(ObjectManager _objects, IFramework _framewor
         return new ActorIdentifier(IdentifierType.Player, ObjectKind.Player, homeWorld, 0, name);
     }
 
+    /// <summary>
+    /// Restore a player identifier previously written by this plugin.
+    /// Regional API13 sheets may not contain the actor's world, so a structurally
+    /// valid saved identifier must not be discarded solely due to sheet coverage.
+    /// </summary>
+    public ActorIdentifier CreatePlayerFromStoredData(ByteString name, WorldId homeWorld)
+    {
+        var identifier = CreatePlayer(name, homeWorld);
+        if (identifier.IsValid)
+            return identifier;
+
+        return name.IsEmpty || homeWorld.Id is 0
+            ? ActorIdentifier.Invalid
+            : new ActorIdentifier(IdentifierType.Player, ObjectKind.Player, homeWorld, 0, name);
+    }
+
     /// <summary> Create a retainer from name and retainer type. Input is checked for correctness. </summary>
     public ActorIdentifier CreateRetainer(ByteString name, ActorIdentifier.RetainerType type)
     {
@@ -282,6 +298,18 @@ public class ActorIdentifierFactory(ObjectManager _objects, IFramework _framewor
             return ActorIdentifier.Invalid;
 
         return new ActorIdentifier(IdentifierType.Owned, kind, homeWorld, dataId, ownerName);
+    }
+
+    /// <summary>Restore a previously validated owned-actor identifier from storage.</summary>
+    public ActorIdentifier CreateOwnedFromStoredData(ByteString ownerName, WorldId homeWorld, ObjectKind kind, NpcId dataId)
+    {
+        var identifier = CreateOwned(ownerName, homeWorld, kind, dataId);
+        if (identifier.IsValid)
+            return identifier;
+
+        return ownerName.IsEmpty || homeWorld.Id is 0 || !VerifyOwnedData(kind, dataId)
+            ? ActorIdentifier.Invalid
+            : new ActorIdentifier(IdentifierType.Owned, kind, homeWorld, dataId, ownerName);
     }
 
     #region Verification

@@ -64,7 +64,7 @@ public static class ActorIdentifierJson
             {
                 var name      = ByteString.FromStringUnsafe(data[nameof(ActorIdentifier.PlayerName)]?.ToObject<string>(), false);
                 var homeWorld = data[nameof(ActorIdentifier.HomeWorld)]?.ToObject<ushort>() ?? 0;
-                return actorManager.CreatePlayer(name, homeWorld);
+                return actorManager.CreatePlayerFromStoredData(name, homeWorld);
             }
             case IdentifierType.Retainer:
             {
@@ -79,7 +79,7 @@ public static class ActorIdentifierJson
                 var homeWorld = data[nameof(ActorIdentifier.HomeWorld)]?.ToObject<ushort>() ?? 0;
                 var kind      = data[nameof(ActorIdentifier.Kind)]?.ToObject<ObjectKind>() ?? ObjectKind.CardStand;
                 var dataId    = data[nameof(ActorIdentifier.DataId)]?.ToObject<uint>() ?? 0;
-                return actorManager.CreateOwned(name, homeWorld, kind, dataId);
+                return actorManager.CreateOwnedFromStoredData(name, homeWorld, kind, dataId);
             }
             case IdentifierType.Special:
             {

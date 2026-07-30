@@ -29,6 +29,11 @@ public sealed class DictWorld(IDalamudPluginInterface pluginInterface, Logger lo
         if (world.Name.IsEmpty)
             return false;
 
+        // Regional Taiwan world rows can have no DataCenter relation in the
+        // API13 sheets. Accept them before the global DataCenter check.
+        if (world.UserType == 151 && world.RowId >= 4028)
+            return true;
+
         if (world.DataCenter.RowId is 0)
             return false;
 
@@ -37,10 +42,6 @@ public sealed class DictWorld(IDalamudPluginInterface pluginInterface, Logger lo
 
         // Korean servers.
         if (world.UserType == 101 && world.RowId > 1000)
-            return true;
-
-        // Chinese and Taiwan servers.
-        if (world.UserType == 151 && world.RowId >= 4028)
             return true;
 
         return char.IsUpper((char)world.Name.Data.Span[0]);
