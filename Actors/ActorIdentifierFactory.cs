@@ -245,6 +245,22 @@ public class ActorIdentifierFactory(ObjectManager _objects, IFramework _framewor
         return new ActorIdentifier(IdentifierType.Player, ObjectKind.Player, homeWorld, 0, name);
     }
 
+    /// <summary>
+    /// Restore a player identifier previously written by this plugin.
+    /// Regional API13 sheets may not contain the actor's world, so a structurally
+    /// valid saved identifier must not be discarded solely due to sheet coverage.
+    /// </summary>
+    public ActorIdentifier CreatePlayerFromStoredData(ByteString name, WorldId homeWorld)
+    {
+        var identifier = CreatePlayer(name, homeWorld);
+        if (identifier.IsValid)
+            return identifier;
+
+        return name.IsEmpty || homeWorld.Id is 0
+            ? ActorIdentifier.Invalid
+            : new ActorIdentifier(IdentifierType.Player, ObjectKind.Player, homeWorld, 0, name);
+    }
+
     /// <summary> Create a retainer from name and retainer type. Input is checked for correctness. </summary>
     public ActorIdentifier CreateRetainer(ByteString name, ActorIdentifier.RetainerType type)
     {
@@ -283,6 +299,18 @@ public class ActorIdentifierFactory(ObjectManager _objects, IFramework _framewor
             return ActorIdentifier.Invalid;
 
         return new ActorIdentifier(IdentifierType.Owned, kind, homeWorld, dataId, ownerName);
+    }
+
+    /// <summary>Restore a previously validated owned-actor identifier from storage.</summary>
+    public ActorIdentifier CreateOwnedFromStoredData(ByteString ownerName, WorldId homeWorld, ObjectKind kind, NpcId dataId)
+    {
+        var identifier = CreateOwned(ownerName, homeWorld, kind, dataId);
+        if (identifier.IsValid)
+            return identifier;
+
+        return ownerName.IsEmpty || homeWorld.Id is 0 || !VerifyOwnedData(kind, dataId)
+            ? ActorIdentifier.Invalid
+            : new ActorIdentifier(IdentifierType.Owned, kind, homeWorld, dataId, ownerName);
     }
 
     #region Verification
@@ -462,8 +490,21 @@ public class ActorIdentifierFactory(ObjectManager _objects, IFramework _framewor
         var name      = actor.Utf8Name;
         var homeWorld = actor.HomeWorld;
         return check
-            ? CreatePlayer(name, homeWorld)
+            ? CreatePlayerFromGameObjectData(name, homeWorld)
             : CreateIndividualUnchecked(IdentifierType.Player, name, homeWorld, ObjectKind.None, uint.MaxValue);
+    }
+
+    /// <summary>
+    /// Create a player identifier from data read directly from a live game object.
+    /// The object has already been validated and identified as a player, so localized
+    /// client naming rules and incomplete regional world sheets must not reject it.
+    /// </summary>
+    private static ActorIdentifier CreatePlayerFromGameObjectData(ByteString name, WorldId homeWorld)
+    {
+        if (name.IsEmpty || homeWorld.Id is 0 or ushort.MaxValue)
+            return ActorIdentifier.Invalid;
+
+        return new ActorIdentifier(IdentifierType.Player, ObjectKind.Player, homeWorld, 0, name);
     }
 
     /// <summary> Create a battle npc from the game object.</summary>

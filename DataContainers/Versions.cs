@@ -30,7 +30,7 @@ public static class Version
     public const int DictBNpcOffset = 9;
     public const int DictBNpc       = UsesTitleCaseOffset + DictBNpcOffset;
 
-    public const int DictWorldOffset = 9;
+    public const int DictWorldOffset = 10;
     public const int DictWorld       = UsesExtractTextOffset + DictWorldOffset;
 
     public const int DictMountOffset = 9;
