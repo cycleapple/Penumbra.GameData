@@ -552,7 +552,7 @@ public class ActorIdentifierFactory(ObjectManager _objects, IFramework _framewor
             {
                 var homeWorld = actor.HomeWorld;
                 return check
-                    ? CreatePlayer(name, homeWorld)
+                    ? CreatePlayerNpcFromGameObjectData(name, homeWorld)
                     : CreateIndividualUnchecked(IdentifierType.Player, name, homeWorld, ObjectKind.None, uint.MaxValue);
             }
         }
@@ -561,6 +561,22 @@ public class ActorIdentifierFactory(ObjectManager _objects, IFramework _framewor
         return check
             ? CreateNpc(ObjectKind.BattleNpc, nameId, index)
             : CreateIndividualUnchecked(IdentifierType.Npc, ByteString.Empty, index.Index, ObjectKind.BattleNpc, nameId);
+    }
+
+    /// <summary>
+    /// Create an identifier for a live player-like battle NPC, such as a Brio-spawned
+    /// GPose actor. These actors are already trusted game objects but can use a
+    /// regional world missing from the local sheet, or no world at all.
+    /// </summary>
+    private static ActorIdentifier CreatePlayerNpcFromGameObjectData(ByteString name, WorldId homeWorld)
+    {
+        if (name.IsEmpty)
+            return ActorIdentifier.Invalid;
+
+        if (homeWorld.Id is 0 or ushort.MaxValue)
+            homeWorld = WorldId.AnyWorld;
+
+        return new ActorIdentifier(IdentifierType.Player, ObjectKind.Player, homeWorld, 0, name);
     }
 
     /// <summary> Create an event npc from the game object.</summary>
