@@ -187,7 +187,7 @@ public class ActorIdentifierFactory(ObjectManager _objects, IFramework _framewor
             return CreateIndividualUnchecked(IdentifierType.Special, ByteString.Empty, idx.Index, ObjectKind.None, uint.MaxValue);
 
         var kind = (ObjectKind)actor.AsObject->ObjectKind;
-        return kind switch
+        var identifier = kind switch
         {
             ObjectKind.Player    => CreatePlayerFromObject(actor, check),
             ObjectKind.BattleNpc => CreateBNpcFromObject(actor, out owner, check, allowPlayerNpc, withoutIndex),
@@ -198,6 +198,22 @@ public class ActorIdentifierFactory(ObjectManager _objects, IFramework _framewor
             ObjectKind.Retainer  => CreateRetainerFromObject(actor, check),
             _                    => CreateUnkFromObject(actor, withoutIndex),
         };
+
+        // Brio and similar GPose tools create additional actors in the slots after the
+        // GPose player. Their transient owner metadata may not resolve through the game
+        // object table, which makes the normal battle-NPC path return an invalid actor.
+        // Keep this fallback limited to additional GPose slots and only use it after the
+        // normal identifier logic failed, so regular players and NPCs are unaffected.
+        if (!identifier.IsValid
+         && idx > ObjectIndex.GPosePlayer
+         && idx < ObjectIndex.CharacterScreen
+         && !actor.Utf8Name.IsEmpty)
+        {
+            owner = Actor.Null;
+            identifier = CreatePlayerNpcFromGameObjectData(actor.Utf8Name, actor.HomeWorld);
+        }
+
+        return identifier;
     }
 
     /// <inheritdoc cref="FromObject(Actor,out Actor,bool,bool,bool)"/>
