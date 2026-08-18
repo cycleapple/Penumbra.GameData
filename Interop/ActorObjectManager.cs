@@ -89,10 +89,16 @@ public unsafe class ActorObjectManager : IDisposable, IReadOnlyDictionary<ActorI
 
     /// <summary> Also handles All Worlds players and non-owned NPCs. </summary>
     public bool ContainsKey(ActorIdentifier key)
-        => Identifiers.ContainsKey(key) || _allWorldIdentifiers.ContainsKey(key) || _nonOwnedIdentifiers.ContainsKey(key);
+    {
+        Update();
+        return _identifiers.ContainsKey(key) || _allWorldIdentifiers.ContainsKey(key) || _nonOwnedIdentifiers.ContainsKey(key);
+    }
 
     public bool TryGetValue(ActorIdentifier key, out ActorData value)
-        => Identifiers.TryGetValue(key, out value);
+    {
+        Update();
+        return _identifiers.TryGetValue(key, out value);
+    }
 
     public bool TryGetValueAllWorld(ActorIdentifier key, out ActorData value)
     {
@@ -107,7 +113,13 @@ public unsafe class ActorObjectManager : IDisposable, IReadOnlyDictionary<ActorI
     }
 
     public ActorData this[ActorIdentifier key]
-        => Identifiers[key];
+    {
+        get
+        {
+            Update();
+            return _identifiers[key];
+        }
+    }
 
     public IEnumerable<ActorIdentifier> Keys
         => Identifiers.Keys;
