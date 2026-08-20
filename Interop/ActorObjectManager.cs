@@ -121,6 +121,20 @@ public unsafe class ActorObjectManager : IDisposable, IReadOnlyDictionary<ActorI
         }
     }
 
+    /// <summary>
+    /// Ensure a directly discovered actor is represented in the identifier cache.
+    /// This covers actors spawned by third-party tools before the game has rebuilt
+    /// its object arrays and raised <see cref="ObjectManager.OnUpdateRequired"/>.
+    /// </summary>
+    public void EnsureIdentifier(ActorIdentifier identifier, Actor actor)
+    {
+        Update();
+        if (!identifier.IsValid || !actor.Valid)
+            return;
+
+        HandleIdentifier(identifier, actor);
+    }
+
     public IEnumerable<ActorIdentifier> Keys
         => Identifiers.Keys;
 
@@ -207,7 +221,8 @@ public unsafe class ActorObjectManager : IDisposable, IReadOnlyDictionary<ActorI
         }
         else
         {
-            data.Objects.Add(character);
+            if (!data.Objects.Contains(character))
+                data.Objects.Add(character);
         }
 
         if (identifier.Type is IdentifierType.Player or IdentifierType.Owned)
@@ -223,7 +238,8 @@ public unsafe class ActorObjectManager : IDisposable, IReadOnlyDictionary<ActorI
             }
             else
             {
-                allWorldData.Objects.Add(character);
+                if (!allWorldData.Objects.Contains(character))
+                    allWorldData.Objects.Add(character);
             }
         }
 
@@ -237,7 +253,8 @@ public unsafe class ActorObjectManager : IDisposable, IReadOnlyDictionary<ActorI
             }
             else
             {
-                nonOwnedData.Objects.Add(character);
+                if (!nonOwnedData.Objects.Contains(character))
+                    nonOwnedData.Objects.Add(character);
             }
         }
     }
