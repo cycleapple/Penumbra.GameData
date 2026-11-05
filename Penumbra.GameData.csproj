@@ -1,4 +1,4 @@
-<Project Sdk="Dalamud.NET.Sdk/13.0.0">
+<Project Sdk="Dalamud.NET.Sdk/14.0.1">
     <PropertyGroup>
         <AssemblyTitle>Penumbra.GameData</AssemblyTitle>
         <Product>Penumbra</Product>
@@ -16,9 +16,9 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\Penumbra.Api\Penumbra.Api.csproj" />
-        <ProjectReference Include="..\Penumbra.String\Penumbra.String.csproj" />
-        <ProjectReference Include="..\OtterGui\OtterGui.csproj" />
+        <ProjectReference Include="api14-deps\Penumbra.Api\Penumbra.Api.csproj" />
+        <ProjectReference Include="api14-deps\Penumbra.String\Penumbra.String.csproj" />
+        <ProjectReference Include="api14-deps\OtterGui\OtterGui.csproj" />
     </ItemGroup>
 
     <ItemGroup>
@@ -28,4 +28,5 @@
     <ItemGroup>
       <None Include="epbd_schema.fbs" />
     </ItemGroup>
+    <ItemGroup><Compile Remove="api14-deps/**/*.cs" /><EmbeddedResource Remove="api14-deps/**" /><None Remove="api14-deps/**" /></ItemGroup>
 </Project>

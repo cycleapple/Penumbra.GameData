@@ -1,0 +1,9 @@
+[submodule "api14-deps/Penumbra.Api"]
+	path = api14-deps/Penumbra.Api
+	url = E:\\FFXIV\\XIVLauncher\\api13-work\\plugins\\Penumbra\\Penumbra.Api
+[submodule "api14-deps/Penumbra.String"]
+	path = api14-deps/Penumbra.String
+	url = E:\\FFXIV\\XIVLauncher\\api13-work\\plugins\\Penumbra\\Penumbra.String
+[submodule "api14-deps/OtterGui"]
+	path = api14-deps/OtterGui
+	url = E:\\FFXIV\\XIVLauncher\\api13-work\\plugins\\Penumbra\\OtterGui
