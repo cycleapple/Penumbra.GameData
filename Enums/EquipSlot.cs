@@ -28,7 +28,8 @@ public enum EquipSlot : byte
     BodyHands         = 20,
     BodyLegsFeet      = 21,
     ChestHands        = 22,
-    Nothing           = 23,
+    BodyLegs          = 23, // Body item that also occupies the leg slot.
+    Nothing           = 25, // Synthetic slot; keep separate from real sheet categories.
     All               = 24, // Not officially existing
 }
 
@@ -180,6 +181,7 @@ public static class EquipSlotExtensions
             EquipSlot.BodyHands         => HumanSlot.Body,
             EquipSlot.BodyLegsFeet      => HumanSlot.Body,
             EquipSlot.ChestHands        => HumanSlot.Body,
+            EquipSlot.BodyLegs          => HumanSlot.Body,
             _                           => HumanSlot.Unknown,
         };
 
@@ -244,6 +246,7 @@ public static class EquipSlotExtensions
             EquipSlot.BodyHands         => EquipSlot.Body,
             EquipSlot.BodyLegsFeet      => EquipSlot.Body,
             EquipSlot.ChestHands        => EquipSlot.Body,
+            EquipSlot.BodyLegs          => EquipSlot.Body,
             _                           => EquipSlot.Unknown,
         };
 
@@ -272,6 +275,7 @@ public static class EquipSlotExtensions
             EquipSlot.FullBody          => "Costume",
             EquipSlot.BodyHands         => "Top",
             EquipSlot.BodyLegsFeet      => "Costume",
+            EquipSlot.BodyLegs          => "Top",
             EquipSlot.All               => "Costume",
             _                           => "Unknown",
         };
@@ -327,6 +331,7 @@ public static class EquipSlotExtensions
             EquipSlot.HeadBody          => true,
             EquipSlot.LegsFeet          => true,
             EquipSlot.ChestHands        => true,
+            EquipSlot.BodyLegs          => true,
             _                           => false,
         };
     }
